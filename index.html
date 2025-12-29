@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Friends · A Memory</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --bg: #12121a;
+    --card: #1c1c26;
+    --text: #f5f5fa;
+    --muted: #b5b5c9;
+    --accent: #d8b4fe;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", system-ui, sans-serif; }
+body { background: var(--bg); color: var(--text); display: flex; justify-content: center; overflow-x: hidden; position: relative; line-height: 1.5; }
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(120deg, #d8b4fe, #12121a, #7c3aed);
+    background-size: 300% 300%;
+    animation: gradientMove 25s ease infinite;
+}
+.wrapper { width: 95%; max-width: 900px; padding: 40px 15px; animation: fadeIn 1.2s ease; }
+
+h1 { font-size: 2rem; margin-bottom: 10px; animation: fadeUp 1.5s ease forwards; }
+.subtitle { color: var(--muted); font-style: italic; margin-bottom: 50px; line-height: 1.6; font-size: 0.95rem; animation: floatSubtitle 3s ease-in-out infinite alternate; }
+
+.letter { background: var(--card); padding: 25px; border-radius: 20px; margin-bottom: 50px; }
+.letter p { line-height: 1.7; color: var(--muted); margin-bottom: 12px; font-size: 0.95rem; }
+.letter span { color: var(--accent); }
+
+.memory-slider, .memories, .video-frame {
+    display: none; /* hidden initially */
+}
+
+.memory-slider { text-align: center; margin-bottom: 50px; }
+.memory-slider h2 { font-size: 1.6rem; margin-bottom: 8px; }
+.slider-subtitle { color: var(--muted); font-style: italic; margin-bottom: 25px; font-size: 0.9rem; }
+
+.slider { width: 100%; max-width: 720px; margin: auto; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.45); aspect-ratio: 16/9; }
+.slides { width: 100%; height: 100%; position: relative; }
+.slide {
+    position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat;
+    display: flex; align-items: flex-end; padding: 20px; opacity: 0;
+    animation: slideShow 20s infinite, slideZoom 20s infinite;
+    border-radius: 20px;
+}
+.slide:nth-child(1) { animation-delay: 0s; }
+.slide:nth-child(2) { animation-delay: 5s; }
+.slide:nth-child(3) { animation-delay: 10s; }
+.slide:nth-child(4) { animation-delay: 15s; }
+.slide span { position: relative; z-index: 1; background: rgba(0,0,0,0.35); padding: 10px 15px; border-radius: 15px; font-size: 0.85rem; backdrop-filter: blur(4px); animation: textPulse 4s ease-in-out infinite; }
+.slide::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.25); border-radius: 20px; }
+
+.memories { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 50px; }
+.memory { background: var(--card); padding: 20px; border-radius: 16px; position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; transform: translateY(20px); opacity: 0; }
+.memory img, .memory video { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
+.memory h3 { margin-bottom: 5px; font-size: 1rem; color: var(--accent);}
+.memory p { font-size: 0.85rem; color: var(--muted); }
+
+.footer-note { text-align: center; color: var(--muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 40px; }
+.footer-note span { display: block; margin-top: 6px; color: var(--accent); letter-spacing: 1px; animation: glowAccent 3s ease-in-out infinite alternate; }
+
+#playButton {
+    display:block;
+    margin:20px auto;
+    padding:12px 25px;
+    border:none;
+    border-radius:20px;
+    background:var(--accent);
+    color:var(--text);
+    font-size:1rem;
+    cursor:pointer;
+    transition:transform 0.2s, box-shadow 0.2s;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes floatSubtitle { 0% { transform: translateY(0px); opacity: 0.9; } 100% { transform: translateY(4px); opacity: 1; } }
+@keyframes slideShow { 0% { opacity: 0; transform: scale(1.05); } 10% { opacity: 1; transform: scale(1); } 25% { opacity: 1; } 35% { opacity: 0; transform: scale(0.98); } 100% { opacity: 0; } }
+@keyframes slideZoom { 0%,100% { transform: scale(1.05); } 25%,75% { transform: scale(1); } }
+@keyframes textPulse { 0%,100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
+@keyframes glowAccent { 0% { text-shadow: 0 0 4px var(--accent); } 50% { text-shadow: 0 0 12px var(--accent); } 100% { text-shadow: 0 0 4px var(--accent); } }
+@keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+@media (max-width: 600px) {
+    h1 { font-size: 1.6rem; }
+    .letter { padding: 20px; }
+    .memory h3 { font-size: 0.95rem; }
+    .memory p { font-size: 0.8rem; }
+    .slider { aspect-ratio: 4/3; }
+    .slide span { font-size: 0.75rem; padding: 6px 10px; }
+}
+
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Lightbox overlay */
+.lightbox {
+    display: none; /* hidden by default */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.lightbox img {
+    max-width: 95%;
+    max-height: 95%;
+    border-radius: 10px;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<h1>A memory that will always be remembered</h1>
+<p class="subtitle">
+    A quiet celebration of laughter, presence, and the moments we’ll always carry.<br>
+    📍 <span>Otirasor</span> · 📅 <span>December 28, 2025</span>
+</p>
+
+<section class="letter">
+    <p>Today unfolded gently — no rush, no expectations. Just <span>us</span>, showing up exactly as we are, letting the moments speak for themselves, unhurried and unfiltered.</p>
+    <p>Some moments were filled with laughter, others with silence that felt safe. Both mattered. Both belonged. Every smile, every pause, every shared glance was a thread weaving the tapestry of this memory.</p>
+    <p>If time ever tries to blur this memory, may this page remember it clearly — the warmth, the ease, the feeling of being understood, the quiet comfort of knowing someone sees you completely and still stays.</p>
+    <p>I will always remember the little things — the shared jokes that made our bellies ache, the gentle nudges of encouragement, the quiet glances that said more than words ever could, the unspoken understanding that only we seem to share.</p>
+    <p>Even when miles stretch between us, these moments stay close, like soft whispers in my heart that never fade, like faint footprints left on the soul, guiding me back to you no matter where we are.</p>
+    <p>The stories we told, the small victories celebrated, the silly mistakes laughed over, the songs hummed quietly while doing nothing — all of it now forms a beautiful mosaic that I carry with me.</p>
+    <p>Thank you for being exactly who you are, for the laughter, for the comfort, for the patience, for the endless little ways you make life brighter, for making memories that feel like home, and for letting me be part of them.</p>
+    <p>In every fleeting second, in every quiet corner of the day, I will hold these memories close. And when life gets too loud or too heavy, I will return here in thought, to this gentle place, and feel the warmth of us once again.</p>
+    <p>And when the stars whisper secrets to the night, I will hear your laughter dancing among them. When the wind carries a soft melody, I will remember the echoes of our shared moments. Time may flow, seasons may change, but this memory — delicate, bright, eternal — will remain, like a light that never dims, guiding me always back to you.</p>
+</section>
+
+<!-- TAP BUTTON -->
+<button id="playButton">Tap to see more</button>
+
+<section class="memory-slider">
+<h2>Moments We Shared</h2>
+<p class="slider-subtitle">Some memories don’t fade — they gently move with time</p>
+<div class="slider">
+    <div class="slides">
+        <div class="slide" style="background-image: url('Images/1.jpg');"></div>
+        <div class="slide" style="background-image: url('Images/12.jpg');"></div>
+        <div class="slide" style="background-image: url('Images/3.jpg');"></div>
+        <div class="slide" style="background-image: url('Images/14.jpg');"></div>
+        <div class="slide" style="background-image: url('Images/11.jpg');"></div>
+        <div class="slide" style="background-image: url('Images/18.jpg');"></div>
+    </div>
+</div>
+</section>
+
+<section class="memories">
+    <div class="memory"><img src="Images/15.jpg" alt=""></div>
+    <div class="memory"><img src="Images/2.jpg" alt=""></div>
+    <div class="memory"><img src="Images/13.jpg" alt=""></div>
+    <div class="memory"><img src="Images/5.jpg" alt=""></div>
+    <div class="memory"><img src="Images/9.jpg" alt=""></div>
+    <div class="memory"><img src="Images/10.jpg" alt=""></div>
+    <div class="memory"><img src="Images/17.jpg" alt=""></div>
+    <div class="memory"><img src="Images/19.jpg" alt=""></div>
+    <div class="memory"><img src="Images/20.jpg" alt=""></div>
+    <div class="memory"><img src="Images/21.jpg" alt=""></div>
+    <!-- Video -->
+   
+</section>
+
+<div class="lightbox" id="lightbox">
+    <img src="" alt="Zoomed Memory" id="lightboxImg">
+</div>
+
+<div class="video-frame" style="margin-bottom:50px; display:none; width:100%; max-width:720px; margin:auto;">
+    <video id="memoryVideo" src="Images/20.mp4" muted playsinline style="width:100%; height:auto; border-radius:10px; object-fit:cover;"></video>
+    <h4 style="color:var(--accent); text-align:center; margin-top:15px;">
+        This little moment is more than just a clip — it's a feeling we’ll carry forever.<br>
+        The laughter, the silence, the warmth — all of it captured here, just for us.<br>
+        — A memory to replay in our hearts<br>
+    </h4>
+</div>
+
+ 
+
+<div class="footer-note">
+   
+No likes. No shares. No audience.<br>
+This space exists only for us.
+
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="Images/Niki.mp3" type="audio/mpeg">
+</audio>
+<script>
+const button = document.getElementById("playButton");
+const music = document.getElementById("bgMusic");
+const sliderSection = document.querySelector(".memory-slider");
+const memories = document.querySelectorAll(".memory");
+const videoFrame = document.querySelector(".video-frame");
+const video = document.getElementById("memoryVideo");
+// Select all memory images
+const memoryImages = document.querySelectorAll(".memory img");
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+
+memoryImages.forEach(img => {
+    img.addEventListener("click", () => {
+        lightbox.style.display = "flex";      // show lightbox
+        lightboxImg.src = img.src;             // set clicked image
+    });
+});
+
+// Close lightbox on click anywhere
+lightbox.addEventListener("click", () => {
+    lightbox.style.display = "none";
+});
+
+
+button.addEventListener("click", () => {
+    // Play music
+    music.play();
+
+    // Reveal slider and memories
+    sliderSection.style.display = "block";
+    videoFrame.style.display = "block"; // reveal video
+    memories.forEach((memory, index) => {
+        setTimeout(() => {
+            memory.style.display = "block";
+            memory.style.opacity = 1;
+            memory.style.transform = "translateY(0)";
+        }, index * 300);
+    });
+
+    // Hide button
+    button.style.display = "none";
+});
+
+// Play video when scrolled into view
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            video.play();
+        } else {
+            video.pause();
+        }
+    });
+}, { threshold: 0.5 }); // triggers when half of video is visible
+
+observer.observe(video);
+</script>
