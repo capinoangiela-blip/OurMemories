@@ -106,6 +106,29 @@ h1 { font-size: 2rem; margin-bottom: 10px; animation: fadeUp 1.5s ease forwards;
     opacity: 1;
     transform: translateY(0);
 }
+
+/* Mobile-friendly image fit (works on all phones) */
+.memory img {
+    width: 100%;
+    height: auto;        /* prevents stretching */
+    max-width: 100%;
+    max-height: 260px;  /* safe height for small screens */
+    object-fit: cover;  /* fills nicely */
+    border-radius: 12px;
+    display: block;
+}
+
+/* Ensure 1 image per row on mobile */
+@media (max-width: 600px) {
+    .memories {
+        grid-template-columns: 1fr;
+    }
+
+    .memory img {
+        max-height: 300px;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -224,6 +247,7 @@ const observer = new IntersectionObserver((entries) => {
 observer.observe(video);
 
 </script>
+
 
 
 
